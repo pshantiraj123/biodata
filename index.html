@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MY Bio-data</title>
 <meta name="description" content="My Biodata and profile">
+<meta name="theme-color" content="#9b2335">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💍%3C/text%3E%3C/svg%3E">
+<!-- Preview card when the link is shared on WhatsApp / Facebook / Telegram.
+     If you rename the repo or use a custom domain, update the two https:// addresses. -->
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Shanti Raj P — Marriage Biodata">
+<meta property="og:description" content="Software Engineer, 28 years, Hyderabad. View full biodata, photos and contact details.">
+<meta property="og:image" content="https://pshantiraj123.github.io/biodata/images/profile.jpg">
+<meta property="og:url" content="https://pshantiraj123.github.io/biodata/">
+<meta name="twitter:card" content="summary_large_image">
 <!-- Keeps the page out of Google search. Remove this line if you want it public in search. -->
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -70,6 +80,10 @@
   .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out}
   .lightbox.open{display:flex}
   .lightbox img{max-width:92vw;max-height:90vh;border-radius:12px}
+  .lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:30px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .lb-nav:hover{background:rgba(255,255,255,.32)}
+  .lb-prev{left:14px}
+  .lb-next{right:14px}
 
   footer{padding:36px 0 60px;text-align:center;color:var(--muted);font-size:13px}
 
@@ -170,6 +184,7 @@
       <div class="actions">
         <a class="btn" id="contactBtn" href="#contact">Contact Family</a>
         <button class="btn ghost" onclick="window.print()">Download as PDF</button>
+        <button class="btn ghost" id="shareBtn">Share</button>
       </div>
     </div>
   </div>
@@ -221,7 +236,11 @@
   </div>
 </footer>
 
-<div class="lightbox" id="lightbox"><img alt=""></div>
+<div class="lightbox" id="lightbox">
+  <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous photo">&#8249;</button>
+  <img alt="">
+  <button class="lb-nav lb-next" id="lbNext" aria-label="Next photo">&#8250;</button>
+</div>
 
 <script>
 /* ======================================================
@@ -376,11 +395,42 @@ if (DATA.gallery.length) {
   $("galleryGrid").querySelectorAll("img").forEach(img => img.addEventListener("error", () => { img.remove(); refreshGallery(); }));
 } else refreshGallery();
 const lb = $("lightbox"), lbImg = lb.querySelector("img");
+let lbIndex = 0;
+const galleryImgs = () => [...$("galleryGrid").querySelectorAll("img")];
+const showLb = i => {
+  const imgs = galleryImgs();
+  if (!imgs.length) return;
+  lbIndex = (i + imgs.length) % imgs.length;
+  lbImg.src = imgs[lbIndex].src;
+  lb.classList.add("open");
+};
 $("galleryGrid").addEventListener("click", e => {
-  if (e.target.tagName === "IMG") { lbImg.src = e.target.src; lb.classList.add("open"); }
+  if (e.target.tagName === "IMG") showLb(galleryImgs().indexOf(e.target));
 });
-lb.addEventListener("click", () => lb.classList.remove("open"));
-document.addEventListener("keydown", e => { if (e.key === "Escape") lb.classList.remove("open"); });
+lb.addEventListener("click", e => { if (!e.target.closest(".lb-nav")) lb.classList.remove("open"); });
+$("lbPrev").addEventListener("click", () => showLb(lbIndex - 1));
+$("lbNext").addEventListener("click", () => showLb(lbIndex + 1));
+document.addEventListener("keydown", e => {
+  if (!lb.classList.contains("open")) return;
+  if (e.key === "Escape") lb.classList.remove("open");
+  if (e.key === "ArrowLeft") showLb(lbIndex - 1);
+  if (e.key === "ArrowRight") showLb(lbIndex + 1);
+});
+
+// Share button: phone share sheet if available, otherwise copy the link
+$("shareBtn").addEventListener("click", async () => {
+  const url = location.href.split("#")[0];
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: DATA.name + " — Biodata", text: "Marriage biodata of " + DATA.name, url });
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    const b = $("shareBtn"), old = b.textContent;
+    b.textContent = "Link copied!";
+    setTimeout(() => { b.textContent = old; }, 2000);
+  } catch (err) { /* user cancelled sharing */ }
+});
 
 // Contact
 const { note, ...contactRows } = DATA.contact;
