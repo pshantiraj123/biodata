@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Marriage Biodata</title>
-<meta name="description" content="Marriage biodata and profile">
+<meta name="description" content="My Biodata and profile">
 <!-- Keeps the page out of Google search. Remove this line if you want it public in search. -->
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -135,7 +135,10 @@
     </div>
   </section>
 
-  <section id="gallery"><h2>Photos</h2><div class="gallery" id="galleryGrid"></div></section>
+  <section id="gallery"><h2>Photos</h2>
+    <div class="gallery" id="galleryGrid"></div>
+    <div class="actions" style="margin-top:18px" id="albumActions"></div>
+  </section>
 
   <section id="contact"><h2>Contact</h2>
     <div class="card">
@@ -228,9 +231,17 @@ const DATA = {
 
   // Add photos to the images folder, then list them here.
   gallery: [
-    // "images/photo1.jpg",
-    // "images/photo2.jpg"
+    "images/gallery/Profile1.jpeg",
+    "images/gallery/Profile2.jpeg",
+    "images/gallery/Profile3.jpeg",
+    "images/gallery/Profile4.jpeg",
+    "images/gallery/Profile5.jpeg",
+    "images/gallery/Profile6.jpeg",
+    "images/gallery/Profile7.jpeg"
   ],
+  // Paste your Google Photos shared-album link here (e.g. https://photos.app.goo.gl/xxxx). "" hides the button.
+  albumLink: "",
+  albumLabel: "View full album on Google Photos",
 
   contact: {
     note: "Serious proposals only. Please reach out directly.",
@@ -287,11 +298,16 @@ if (hasPrefRows || hasPrefList) {
 } else hideSection("preferences");
 
 // Gallery + lightbox
-function refreshGallery(){ if (!$("galleryGrid").querySelector("img")) hideSection("gallery"); }
+const hasAlbum = !!(DATA.albumLink && DATA.albumLink.trim());
+function refreshGallery(){ if (!$("galleryGrid").querySelector("img") && !hasAlbum) hideSection("gallery"); }
+if (hasAlbum) {
+  $("albumActions").innerHTML =
+    `<a class="btn" href="${esc(DATA.albumLink)}" target="_blank" rel="noopener">${esc(DATA.albumLabel || "View full album")}</a>`;
+}
 if (DATA.gallery.length) {
   $("galleryGrid").innerHTML = DATA.gallery.map(src => `<img src="${esc(src)}" alt="Photo" loading="lazy">`).join("");
   $("galleryGrid").querySelectorAll("img").forEach(img => img.addEventListener("error", () => { img.remove(); refreshGallery(); }));
-} else hideSection("gallery");
+} else refreshGallery();
 const lb = $("lightbox"), lbImg = lb.querySelector("img");
 $("galleryGrid").addEventListener("click", e => {
   if (e.target.tagName === "IMG") { lbImg.src = e.target.src; lb.classList.add("open"); }
