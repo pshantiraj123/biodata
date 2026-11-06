@@ -57,6 +57,7 @@
   #personal{--sec:#1d6fa5}     /* blue */
   #education{--sec:#2e7d5b}    /* green */
   #family{--sec:#c26a1b}       /* orange */
+  #faith{--sec:#8a6d1f}        /* gold */
   #horoscope{--sec:#6b3fa0}    /* purple */
   #preferences{--sec:#b0366a}  /* pink */
   #gallery{--sec:#0f8b8d}      /* teal */
@@ -84,6 +85,13 @@
   .lb-nav:hover{background:rgba(255,255,255,.32)}
   .lb-prev{left:14px}
   .lb-next{right:14px}
+
+  /* Bible verse banner */
+  .verse{background:linear-gradient(180deg,#fbf3dd,#fdf8f3);border-top:1px solid #ecdcae;border-bottom:1px solid #ecdcae;padding:26px 0;text-align:center}
+  .verse p{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(18px,2.6vw,24px);color:#5b4a14;max-width:760px;margin:0 auto}
+  .verse span{display:block;margin-top:8px;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8a6d1f}
+  .verse::before{content:"\271D";display:block;font-size:22px;color:#8a6d1f;margin-bottom:6px}
+  .verse p,.verse span{animation:fadeUp .9s ease both}
 
   footer{padding:36px 0 60px;text-align:center;color:var(--muted);font-size:13px}
 
@@ -165,6 +173,7 @@
       <a href="#personal">Personal</a>
       <a href="#education">Education &amp; Career</a>
       <a href="#family">Family</a>
+      <a href="#faith">Faith</a>
       <a href="#horoscope">Horoscope</a>
       <a href="#preferences">Preferences</a>
       <a href="#gallery">Photos</a>
@@ -190,6 +199,13 @@
   </div>
 </header>
 
+<div class="verse hidden" id="verse">
+  <div class="wrap">
+    <p id="verseText"></p>
+    <span id="verseRef"></span>
+  </div>
+</div>
+
 <main class="wrap">
   <section id="about"><h2>About Me</h2><div class="card"><p class="about" id="aboutText"></p></div></section>
 
@@ -203,6 +219,8 @@
   </section>
 
   <section id="family"><h2>Family Details</h2><div class="card"><dl class="rows" id="familyRows"></dl></div></section>
+
+  <section id="faith"><h2>Faith &amp; Church</h2><div class="card"><dl class="rows" id="faithRows"></dl></div></section>
 
   <section id="horoscope"><h2>Horoscope</h2><div class="card"><dl class="rows" id="horoRows"></dl></div></section>
 
@@ -248,7 +266,7 @@
    and that row / section is hidden automatically.
    ====================================================== */
 const DATA = {
-  tagline: "Biodata",
+  tagline: "✝ Biodata",
   name: "Shanti Raj P",
   headline: "Software professional who loves travel, family time and good food.",
   photo: "images/profile.jpg",
@@ -294,6 +312,33 @@ const DATA = {
     "Native place": "Kurnool, Andhra Pradesh",
     "Property": "Own house"
   },
+
+  // Faith & Church. Fill in what you like; empty rows are hidden, and the section hides if all are empty.
+  faith: {
+    "Faith": "Believers in Jesus Christ",
+    "Denomination": "",
+    "Church name": "",
+    "Church location": "",
+    "Pastor": "",
+    "Baptism": ""
+  },
+
+  // Bible verses (KJV). One is picked at random on every refresh.
+  // Add or remove lines freely. Set verses: [] to hide the banner.
+  verses: [
+    { text: "Whoso findeth a wife findeth a good thing, and obtaineth favour of the LORD.", ref: "Proverbs 18:22" },
+    { text: "And the LORD God said, It is not good that the man should be alone; I will make him an help meet for him.", ref: "Genesis 2:18" },
+    { text: "Two are better than one; because they have a good reward for their labour.", ref: "Ecclesiastes 4:9" },
+    { text: "And if one prevail against him, two shall withstand him; and a threefold cord is not quickly broken.", ref: "Ecclesiastes 4:12" },
+    { text: "And now abideth faith, hope, charity, these three; but the greatest of these is charity.", ref: "1 Corinthians 13:13" },
+    { text: "And above all these things put on charity, which is the bond of perfectness.", ref: "Colossians 3:14" },
+    { text: "Wherefore they are no more twain, but one flesh. What therefore God hath joined together, let not man put asunder.", ref: "Matthew 19:6" },
+    { text: "Husbands, love your wives, even as Christ also loved the church, and gave himself for it.", ref: "Ephesians 5:25" },
+    { text: "Trust in the LORD with all thine heart; and lean not unto thine own understanding.", ref: "Proverbs 3:5" },
+    { text: "Delight thyself also in the LORD; and he shall give thee the desires of thine heart.", ref: "Psalm 37:4" },
+    { text: "For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end.", ref: "Jeremiah 29:11" },
+    { text: "We love him, because he first loved us.", ref: "1 John 4:19" }
+  ],
 
   // Fill these when ready. Empty values keep the section hidden.
   horoscope: {
@@ -369,6 +414,24 @@ $("eduRows").innerHTML = rows(DATA.education);
 $("jobRows").innerHTML = rows(DATA.job);
 $("familyRows").innerHTML = rows(DATA.family);
 $("updated").textContent = DATA.updated;
+
+// Faith & Church
+if (clean(DATA.faith).length) $("faithRows").innerHTML = rows(DATA.faith);
+else hideSection("faith");
+
+// Bible verse: a different verse on every refresh (never the same one twice in a row)
+if (DATA.verses && DATA.verses.length) {
+  const n = DATA.verses.length;
+  let last = -1;
+  try { last = parseInt(localStorage.getItem("lastVerse"), 10); if (isNaN(last)) last = -1; } catch (e) {}
+  let i = Math.floor(Math.random() * n);
+  if (n > 1 && i === last) i = (i + 1 + Math.floor(Math.random() * (n - 1))) % n;
+  try { localStorage.setItem("lastVerse", String(i)); } catch (e) {}
+  const v = DATA.verses[i];
+  $("verseText").textContent = "\u201C" + v.text + "\u201D";
+  $("verseRef").textContent = v.ref || "";
+  $("verse").classList.remove("hidden");
+}
 
 // Horoscope
 if (clean(DATA.horoscope).length) $("horoRows").innerHTML = rows(DATA.horoscope);
