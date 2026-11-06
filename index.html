@@ -98,8 +98,8 @@
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
 
   /* Coloured logo buttons: each one uses its brand colour. Logo size = the svg width/height below. */
-  .btn.brand{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;font-size:13px;color:#fff;border-color:var(--b);background:var(--b)}
-  .btn.brand svg{width:13px;height:13px;flex:none}
+  .btn.brand{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;font-size:12px;color:#fff;border-color:var(--b);background:var(--b)}
+  .btn.brand svg{width:11px;height:11px;flex:none}
   .btn.whatsapp{--b:#25D366}
   .btn.call{--b:#1e9e5a}
   .btn.call.father{--b:#e07b00}
@@ -109,9 +109,21 @@
   .btn.instagram{border-color:transparent;background:linear-gradient(45deg,#f09433,#e6683c 30%,#dc2743 55%,#cc2366 75%,#bc1888)}
 
   /* Round tap-to-call phone icon (next to Father) */
-  .call-ico{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--sec,var(--accent));color:#fff;margin-left:6px;vertical-align:middle;transition:transform .2s ease,box-shadow .2s ease}
-  .call-ico svg{width:12px;height:12px}
+  .call-ico{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--sec,var(--accent));color:#fff;margin-left:6px;vertical-align:middle;transition:transform .2s ease,box-shadow .2s ease}
+  .call-ico svg{width:11px;height:11px}
   .call-ico:hover{transform:scale(1.12);box-shadow:0 4px 10px rgba(0,0,0,.2)}
+
+  /* Small note shown above the contact icons */
+  /* The note blinks and changes colour (change 3s to make it faster or slower) */
+  .icon-note{margin-top:16px;font-size:13px;font-weight:600;color:var(--muted);animation:noteBlink 3s ease-in-out infinite}
+  @keyframes noteBlink{
+    0%{color:#25D366;opacity:1}
+    20%{color:#EA4335;opacity:.25}
+    40%{color:#0A66C2;opacity:1}
+    60%{color:#e07b00;opacity:.25}
+    80%{color:#bc1888;opacity:1}
+    100%{color:#25D366;opacity:.25}
+  }
 
   footer{padding:36px 0 60px;text-align:center;color:var(--muted);font-size:13px}
 
@@ -262,7 +274,8 @@
     <div class="card">
       <p id="contactNote" style="margin-bottom:14px;color:var(--muted)"></p>
       <dl class="rows" id="contactRows"></dl>
-      <div class="actions" style="margin-top:18px" id="contactActions"></div>
+      <p class="icon-note hidden" id="iconNote"></p>
+      <div class="actions" style="margin-top:8px" id="contactActions"></div>
     </div>
   </section>
 </main>
@@ -343,7 +356,7 @@ const DATA = {
     "Church name": "",
     "Church location": "",
     "Pastor": "",
-    "Baptism": "NO"
+    "Baptism": ""
   },
 
   // Bible verses (KJV). One is picked at random on every refresh.
@@ -407,17 +420,19 @@ const DATA = {
   ],
   // Paste your Google Photos shared-album link here (e.g. https://photos.app.goo.gl/xxxx). "" hides the button.
   albumLink: "https://photos.app.goo.gl/wtFUVy3qtHNxc5fr9",
-  albumLabel: "View More Photos",
+  albumLabel: "View full album on Google Photos",
 
   contact: {
     note: "Serious proposals only. Please reach out directly.",
     "Phone": "+91 88855 05038",
-    "Email": "pshantiraj123@gmail.com"
+    "Email": "pshantiraj123@gmail.com",
+    "Alternate email": "pshantiraj2020@gmail.com"
   },
   whatsapp: "918885505038",    // country code + number, no + or spaces
   whatsappMessage: "Namaste, I saw the biodata and would like to connect.",
   linkedin: "https://www.linkedin.com/in/pshantiraj123",   // set to "" to hide the button
   instagram: "https://www.instagram.com/shantiraj_5512",   // set to "" to hide the button
+  iconNote: "Tap any icon below to reach me directly",   // note shown above the contact icons. "" hides it
   updated: "November 2026"
 };
 
@@ -557,6 +572,10 @@ const { note, ...contactRows } = DATA.contact;
 const hasContact = clean(contactRows).length > 0 || DATA.whatsapp.trim() !== "";
 if (hasContact) {
   $("contactNote").textContent = note;
+  if (DATA.iconNote && DATA.iconNote.trim()) {
+    $("iconNote").textContent = DATA.iconNote;
+    $("iconNote").classList.remove("hidden");
+  }
   $("contactRows").innerHTML = rows(contactRows);
   let btns = "";
   if (DATA.whatsapp.trim())
