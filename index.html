@@ -233,13 +233,14 @@ const DATA = {
   ],
 
   contact: {
-    note: "Please contact the family. Serious proposals only.",
-    "Contact person": "",
-    "Phone": "",
-    "Email": ""
+    note: "Serious proposals only. Please reach out directly.",
+    "Phone": "+91 88855 05038",
+    "Email": "pshantiraj2020@gmail.com",
+    "Alternate email": "pshantiraj123@gmail.com"
   },
-  whatsapp: "",                // e.g. "919876543210" (country code + number, no + or spaces)
+  whatsapp: "918885505038",    // country code + number, no + or spaces
   whatsappMessage: "Namaste, I saw the biodata and would like to connect.",
+  linkedin: "https://www.linkedin.com/in/pshantiraj123",   // set to "" to hide the button
   updated: "November 2026"
 };
 
@@ -311,6 +312,8 @@ if (hasContact) {
     btns += `<a class="btn ghost" href="tel:${esc(DATA.contact.Phone.replace(/\s/g,''))}">Call</a>`;
   if (DATA.contact.Email && DATA.contact.Email.trim())
     btns += `<a class="btn ghost" href="mailto:${esc(DATA.contact.Email)}?subject=Regarding%20biodata">Email</a>`;
+  if (DATA.linkedin && DATA.linkedin.trim())
+    btns += `<a class="btn ghost" href="${esc(DATA.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`;
   $("contactActions").innerHTML = btns;
 } else {
   hideSection("contact");
