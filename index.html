@@ -93,6 +93,10 @@
   .verse::before{content:"\271D";display:block;font-size:22px;color:#8a6d1f;margin-bottom:6px}
   .verse p,.verse span{animation:fadeUp .9s ease both}
 
+  /* Blinking notice in the footer (change 1.6s to make it faster or slower) */
+  .blink{color:var(--accent);font-weight:600;animation:blink 1.6s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
   /* Round tap-to-call phone icon */
   .call-ico{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--sec,var(--accent));color:#fff;margin-left:8px;vertical-align:middle;transition:transform .2s ease,box-shadow .2s ease}
   .call-ico:hover{transform:scale(1.12);box-shadow:0 6px 14px rgba(0,0,0,.2)}
@@ -253,8 +257,9 @@
 
 <footer>
   <div class="wrap">
-    <p>Biodata shared for matrimonial purposes only. Please do not forward without the family's permission.</p>
+    <p class="blink">Biodata shared for matrimonial purposes only. Please do not forward without the family's permission.</p>
     <p class="noprint" style="margin-top:6px">Last updated: <span id="updated"></span></p>
+    <p class="noprint hidden" id="viewsWrap" style="margin-top:6px">&#128065; <strong id="viewCount">0</strong> profile views</p>
   </div>
 </footer>
 
@@ -313,8 +318,8 @@ const DATA = {
   family: {
     "Father": { text: "Mr. Ashirvadam (Agriculturist)", call: "tel:" + FATHER_PHONE.replace(/\s/g, "") },
     "Mother": "Mrs. Ramanamma (Homemaker and Agriculturist)",
-    "Siblings": "1 Elder Sister (married), 1 Brother (working, unmarried), and 1 Younger Sister (studying, unmarried).",
-    "Family type": "Christian family (believers in Jesus Christ)",
+    "Siblings": "1 elder sister (married); 1 brother and 1 sister (both unmarried)",
+    "Family type": "Nuclear, Christian family (believers in Jesus Christ)",
     "Native place": "Kurnool District, Andhra Pradesh",
     "Residence": "Own house"
   },
@@ -534,6 +539,28 @@ if (hasContact) {
   hideSection("contact");
   $("contactBtn").classList.add("hidden");
 }
+
+// Profile view counter (free CounterAPI v1, no sign-up).
+// The same browser is counted once every 12 hours. Open the page with ?nocount at the end of the link to view without counting.
+(function(){
+  const NS = "pshantiraj123-biodata", NAME = "views";
+  const base = `https://api.counterapi.dev/v1/${NS}/${NAME}`;
+  let skip = location.search.includes("nocount");
+  try {
+    const t = parseInt(localStorage.getItem("viewCountedAt"), 10);
+    if (!isNaN(t) && Date.now() - t < 12 * 3600 * 1000) skip = true;
+  } catch (e) {}
+  fetch(skip ? base + "/" : base + "/up")
+    .then(r => r.json())
+    .then(d => {
+      const n = d.count ?? d.value ?? (d.data && d.data.up_count);
+      if (typeof n !== "number") return;
+      $("viewCount").textContent = n.toLocaleString("en-IN");
+      $("viewsWrap").classList.remove("hidden");
+      if (!skip) { try { localStorage.setItem("viewCountedAt", String(Date.now())); } catch (e) {} }
+    })
+    .catch(() => {});   // if the counter service is down, the line simply stays hidden
+})();
 
 // Effects: progress bar, scroll reveal, active menu link
 (function(){
