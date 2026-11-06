@@ -93,6 +93,10 @@
   .verse::before{content:"\271D";display:block;font-size:22px;color:#8a6d1f;margin-bottom:6px}
   .verse p,.verse span{animation:fadeUp .9s ease both}
 
+  /* Round tap-to-call phone icon */
+  .call-ico{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--sec,var(--accent));color:#fff;margin-left:8px;vertical-align:middle;transition:transform .2s ease,box-shadow .2s ease}
+  .call-ico:hover{transform:scale(1.12);box-shadow:0 6px 14px rgba(0,0,0,.2)}
+
   footer{padding:36px 0 60px;text-align:center;color:var(--muted);font-size:13px}
 
   /* ================= Effects ================= */
@@ -265,6 +269,8 @@
    EDIT ONLY THIS BLOCK. Leave a value as "" (or a list as [])
    and that row / section is hidden automatically.
    ====================================================== */
+const FATHER_PHONE = "+91 99083 13398";   // father's direct number (used in Family and Contact)
+
 const DATA = {
   tagline: "✝ Biodata",
   name: "Shanti Raj P",
@@ -305,12 +311,12 @@ const DATA = {
   },
 
   family: {
-    "Father": "ASHIRVADAM — Farmer",
-    "Mother": "RAMANAMMA — Homemaker / Farmer",
-    "Siblings": "1 Elder Sister (Married), 1 Brother and 1 Sister (unmarried)",
-    "Family type": "Believers in JESUS",
-    "Native place": "Kurnool, Andhra Pradesh",
-    "Property": "Own house"
+    "Father": { text: "Mr. Ashirvadam (Agriculturist)", call: "tel:" + FATHER_PHONE.replace(/\s/g, "") },
+    "Mother": "Mrs. Ramanamma (Homemaker and Agriculturist)",
+    "Siblings": "1 Elder Sister (married), 1 Brother (working, unmarried), and 1 Younger Sister (studying, unmarried).",
+    "Family type": "Christian family (believers in Jesus Christ)",
+    "Native place": "Kurnool District, Andhra Pradesh",
+    "Residence": "Own house"
   },
 
   // Faith & Church. Fill in what you like; empty rows are hidden, and the section hides if all are empty.
@@ -390,7 +396,16 @@ const DATA = {
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clean = obj => Object.entries(obj).filter(([k,v]) => String(v).trim() !== "");
-const rows = obj => clean(obj).map(([k,v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
+const PHONE_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>';
+// A value can be plain text, or { text, call } to show a tap-to-call phone icon (the number itself is not displayed)
+const rows = obj => clean(obj).map(([k,v]) => {
+  let html;
+  if (typeof v === "object") {
+    html = esc(v.text || "");
+    if (v.call) html += ` <a class="call-ico" href="${esc(v.call)}" title="Call ${esc(k)}" aria-label="Call ${esc(k)}">${PHONE_SVG}</a>`;
+  } else html = esc(v);
+  return `<dt>${esc(k)}</dt><dd>${html}</dd>`;
+}).join("");
 const hideSection = id => {
   $(id).classList.add("hidden");
   const link = document.querySelector(`nav a[href="#${id}"]`);
@@ -506,6 +521,8 @@ if (hasContact) {
     btns += `<a class="btn" href="https://wa.me/${esc(DATA.whatsapp)}?text=${encodeURIComponent(DATA.whatsappMessage)}" target="_blank" rel="noopener">WhatsApp</a>`;
   if (DATA.contact.Phone && DATA.contact.Phone.trim())
     btns += `<a class="btn ghost" href="tel:${esc(DATA.contact.Phone.replace(/\s/g,''))}">Call</a>`;
+  if (FATHER_PHONE.trim())
+    btns += `<a class="btn ghost" href="tel:${esc(FATHER_PHONE.replace(/\s/g,''))}">Call Father</a>`;
   if (DATA.contact.Email && DATA.contact.Email.trim())
     btns += `<a class="btn ghost" href="mailto:${esc(DATA.contact.Email)}?subject=Regarding%20biodata">Email</a>`;
   if (DATA.linkedin && DATA.linkedin.trim())
