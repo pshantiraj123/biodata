@@ -26,8 +26,8 @@
   nav .links{display:flex;gap:18px;white-space:nowrap}
   nav a{text-decoration:none;color:var(--muted);font-size:14px;font-weight:500}
   nav a:hover{color:var(--accent)}
-  .btn{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;font-family:inherit}
-  .btn.ghost{background:transparent;color:var(--accent)}
+  .btn{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid var(--sec,var(--accent));background:var(--sec,var(--accent));color:#fff;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;font-family:inherit}
+  .btn.ghost{background:transparent;color:var(--sec,var(--accent))}
   .btn:hover{opacity:.9}
 
   .hero{padding:48px 0 32px}
@@ -41,9 +41,21 @@
   .actions{display:flex;gap:10px;flex-wrap:wrap}
 
   section{padding:28px 0}
-  section h2{font-size:28px;margin-bottom:6px}
-  section h2::after{content:"";display:block;width:56px;height:3px;background:var(--gold);margin-top:8px;border-radius:2px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-top:18px;box-shadow:0 2px 10px rgba(80,40,30,.04)}
+
+  /* Each section has its own colour theme (--sec). Change the colours here. */
+  #about{--sec:#9b2335}        /* maroon */
+  #personal{--sec:#1d6fa5}     /* blue */
+  #education{--sec:#2e7d5b}    /* green */
+  #family{--sec:#c26a1b}       /* orange */
+  #horoscope{--sec:#6b3fa0}    /* purple */
+  #preferences{--sec:#b0366a}  /* pink */
+  #gallery{--sec:#0f8b8d}      /* teal */
+  #contact{--sec:#3a4a8c}      /* indigo */
+
+  section h2{font-size:28px;margin-bottom:6px;color:var(--sec,var(--ink))}
+  section h2::after{content:"";display:block;width:56px;height:3px;background:var(--sec,var(--gold));margin-top:8px;border-radius:2px}
+  .card{background:linear-gradient(180deg,color-mix(in srgb,var(--sec,#9b2335) 7%,#fff),#fff 90px);border:1px solid var(--line);border-top:4px solid var(--sec,var(--accent));border-radius:16px;padding:24px;margin-top:18px;box-shadow:0 2px 10px rgba(80,40,30,.04)}
+  .card h3{color:var(--sec,var(--ink))}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
   .grid .card h3{margin-bottom:14px}
   dl.rows{display:grid;grid-template-columns:150px 1fr;gap:10px 14px;font-size:15px}
@@ -184,7 +196,7 @@ const DATA = {
     "Languages known": "Telugu, English, Hindi",
     "Diet": "Vegetarian and Non-vegetarian",
     "Habits": "Non-smoker, non-drinker",
-    "Permanant Address": " Thimmamdoddi Village , C Belagal Mandal, Kurnool Dist - 518462",
+    "Permanent Address": "Thimmamdoddi Village, C Belagal Mandal, Kurnool Dist - 518462",
     "Current city": "Hyderabad, Telangana"
   },
 
@@ -204,7 +216,7 @@ const DATA = {
 
   family: {
     "Father": "ASHIRVADAM — Farmer",
-    "Mother": "RAMANAMMA— Homemaker / Farmer",
+    "Mother": "RAMANAMMA — Homemaker / Farmer",
     "Siblings": "1 Elder Sister (Married), 1 Brother and 1 Sister (unmarried)",
     "Family type": "Believers in JESUS",
     "Native place": "Kurnool, Andhra Pradesh",
@@ -231,7 +243,7 @@ const DATA = {
   ],
 
   // Add photos to the images folder, then list them here.
-    gallery: [
+  gallery: [
     "images/Profile1.jpeg",
     "images/Profile2.jpeg",
     "images/Profile3.jpeg",
@@ -253,6 +265,7 @@ const DATA = {
   whatsapp: "918885505038",    // country code + number, no + or spaces
   whatsappMessage: "Namaste, I saw the biodata and would like to connect.",
   linkedin: "https://www.linkedin.com/in/pshantiraj123",   // set to "" to hide the button
+  instagram: "https://www.instagram.com/shantiraj_5512",   // set to "" to hide the button
   updated: "November 2026"
 };
 
@@ -331,6 +344,8 @@ if (hasContact) {
     btns += `<a class="btn ghost" href="mailto:${esc(DATA.contact.Email)}?subject=Regarding%20biodata">Email</a>`;
   if (DATA.linkedin && DATA.linkedin.trim())
     btns += `<a class="btn ghost" href="${esc(DATA.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>`;
+  if (DATA.instagram && DATA.instagram.trim())
+    btns += `<a class="btn ghost" href="${esc(DATA.instagram)}" target="_blank" rel="noopener">Instagram</a>`;
   $("contactActions").innerHTML = btns;
 } else {
   hideSection("contact");
